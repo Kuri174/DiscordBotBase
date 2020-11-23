@@ -38,7 +38,7 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    sendMsg(mychannel, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    sendMsg(mychannel, "<@417553593697042432> おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
 
 client.on('message', message => {
