@@ -38,8 +38,8 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-    sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    //sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    //sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
 
 client.on('message', message => {
@@ -47,71 +47,58 @@ client.on('message', message => {
         return;
     }
     if (message.content.match(/にゃ～ん|にゃーん/)) {
+        sendMsg(message.channel.id, "にゃ～んにゃん❤️");
         if (message.author.id == myserver_author_id) {
             sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
         }
-        sendMsg(message.channel.id, "にゃ～んにゃん❤️");
         return;
     }
     if (message.content.match(/こらー/)) {
         sendMsg(message.channel.id, "ごめんなさい><");
         return;
     }
-    // if (message.content.match(/！ナツメちゃん/)) {
-    //     sendMsg(message.channel.id, "はーい❤️");
+    if (message.content.match(/！ナツメちゃん/)) {
+        sendMsg(message.channel.id, "はーい❤️");
 
-    //     let mcount = 0;
-    //     let text = "あと{}人 募集中\n";
-    //     let revmsg = text.format(mcount);
-    //     // friend_list 押した人のList
-    //     let frelist = [];
-    //     let msg = client.send_message(message.channel, revmsg)
+        let count = 0;
+        let frelist = [];
+        let msg = client.send_message(message.channel, "今日参加する人〜✋")
 
-    //     // #投票の欄
-    //     client.add_reaction(msg, '\u21a9')
-    //     client.add_reaction(msg, '⏫')
-    //     client.pin_message(msg)
+        // 投票の欄
+        client.add_reaction(msg, '\u21a9')
+        client.add_reaction(msg, '⏫')
+        client.pin_message(msg)
 
-    //     // リアクションをチェックする
-    //     while (1) {
-    //         let target_reaction = client.wait_for_reaction(message = msg);
-    //         // 発言したユーザが同一でない場合 真
-    //         if (target_reaction.user != msg.author) {
-
-    //             // 押された絵文字が既存のものの場合 >> 左　del
-    //             if (target_reaction.reaction.emoji == '\u21a9') {
-
-    //                 // ◀のリアクションに追加があったら反応 frelistにuser.nameがあった場合　真
-    //                 if (target_reaction.user.name in frelist) {
-    //                     frelist.remove(target_reaction.user.name)
-    //                     mcount += 1;
-    //                     // リストから名前削除
-    //                     client.edit_message(msg, text.format(mcount) + '\n'.join(frelist));
-    //                     // メッセージを書き換え
-
-    //                 } else pass
-    //                 //押された絵文字が既存のものの場合 >> 右　add
-    //             } else if (target_reaction.reaction.emoji == '⏫') {
-    //                 if (target_reaction.user.name in frelist) {
-    //                     pass
-    //                 } else {
-    //                     frelist.append(target_reaction.user.name);
-    //                     // リストに名前追加
-    //                     mcount = mcount - 1;
-    //                     await client.edit_message(msg, text.format(mcount) +
-    //                         '\n'.join(frelist));
-    //                 }
-    //             } else if (target_reaction.reaction.emoji == '✖') {
-    //                 client.edit_message(msg, '募集終了\n' + '\n'.join(frelist));
-    //                 client.unpin_message(msg);
-    //                 break;
-    //                 await client.remove_reaction(msg, target_reaction.reaction.emoji, target_reaction.user);
-    //             // ユーザーがつけたリアクションを消す※権限によってはエラー
-    //             }
-    //         } else
-    //             client.edit_message(msg, '募集終了\n' + '\n'.join(frelist))
-    //     }
-    // }
+        // リアクションをチェックする
+        while (1) {
+            let target_reaction = client.wait_for_reaction(message = msg);
+            // 発言したユーザが同一でない場合 真
+            if (target_reaction.user != msg.author) {
+                // 押された絵文字が既存のものの場合 >> 左　del
+                if (target_reaction.reaction.emoji == '\u21a9') {
+                    // ◀のリアクションに追加があったら反応 frelistにuser.nameがあった場合　真
+                    if (target_reaction.user.name in frelist) {
+                        frelist.remove(target_reaction.user.name)
+                        count -= 1;
+                    }
+                    //押された絵文字が既存のものの場合 >> 右　add
+                } else if (target_reaction.reaction.emoji == '⏫') {
+                    if (!(target_reaction.user.name in frelist)) {
+                        // リストに名前追加
+                        frelist.append(target_reaction.user.name);
+                        count += 1;
+                    }
+                } else if (target_reaction.reaction.emoji == '✖') {
+                    // client.edit_message(msg, '募集終了\n' + '\n'.join(frelist));
+                    // client.unpin_message(msg);
+                    break;
+                    client.remove_reaction(msg, target_reaction.reaction.emoji, target_reaction.user);
+                    // ユーザーがつけたリアクションを消す※権限によってはエラー
+                }
+            } else
+                client.edit_message(msg, '募集終了\n' + '\n'.join(frelist))
+        }
+    }
     return;
 });
 
