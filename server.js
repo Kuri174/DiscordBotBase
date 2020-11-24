@@ -37,7 +37,8 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    sendMsg(mychannel_id, "<@&780007022933573633> おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    sendMsg(mychannel_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    sendMsg(mychannel_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
 
 client.on('message', message => {
@@ -54,9 +55,20 @@ client.on('message', message => {
         sendMsg(message.channel.id, text);
         return;
     }
-    if (message.content.startswith("!ナツメちゃん")) {
-        let text = "はーい♡";
-        sendMsg(message.channel.id, text);
+    if (message.content.match(/！ナツメちゃん/)) {
+        sendMsg(message.channel.id, "はーい❤️");
+
+        let mcount = 2;
+        text = "あと{}人 募集中\n"
+        revmsg = text.format(mcount)
+        // friend_list 押した人のList
+        frelist = []
+        msg = await client.send_message(message.channel, revmsg)
+
+        // #投票の欄
+        await client.add_reaction(msg, '\u21a9')
+        await client.add_reaction(msg, '⏫')
+        await client.pin_message(msg)
         return;
     }
 });
