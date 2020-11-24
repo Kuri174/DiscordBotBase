@@ -57,12 +57,12 @@ client.on('message', message => {
         sendMsg(message.channel.id, "ごめんなさい><");
         return;
     }
-    if (message.content.match(/！ナツメちゃん/)) {
+    if (message.content.match(/！ナツメ/)) {
         sendMsg(message.channel.id, "はーい❤️");
 
         let count = 0;
         let frelist = [];
-        let msg = client.send_message(message.channel, "今日参加する人〜✋")
+        let msg = sendMsg(message.channel.id, "今日参加する人〜✋");
 
         // 投票の欄
         client.add_reaction(msg, '\u21a9')
