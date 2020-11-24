@@ -7,7 +7,7 @@ const client = new discord.Client();
 const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
 
-let Array = [];
+const now = new Date();
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -41,8 +41,6 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    // const fastmessage = client.channels.cache.find(ch => ch.name === '村役場').send('参加する方は、ここにリアクションしてください！');
-    // const fastmessagereaction = fastmessage.react('1️⃣');//リアクションをBot自身が追加
     //sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
     //sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
@@ -62,18 +60,21 @@ client.on('message', message => {
         return;
     }
     if (message.content.match(/!natume/)) {
-        client.channels.get(message.channel.id).send("今日参加する人〜").then(
-            msg => {
+        client.channels.get(message.channel.id).send("今日参加する人〜")
+            .then(msg => {
                 msg.react("👍")
-                msg.react("👎")
-            }
-        )
-        message.react('👍').then(() => message.react('😇'));
+                msg.react("😇")
+            });
+
+        let Array = [];
+        // message.react('👍').then(() => message.react('😇'));
 
         const filter = (reaction, user) => {
             return ['👍', '😇'].includes(reaction.emoji.name) && user.id === message.author.id;
         };
-        message.awaitReactions(filter, { max: 2, time: 60000, errors: ['time'] })
+
+        client.channels.get(message.channel.id).send(now.getSeconds());
+        message.awaitReactions(filter, { time: 15000 })
             .then(collected => {
                 const reaction = collected.first();
 
@@ -81,20 +82,23 @@ client.on('message', message => {
                     if (!(Array.includes(message.author.id))) {
                         Array.push(message.author.id);
                     }
-                } else {
+                } else if (reaction.emoji.name === '😇') {
                     if (Array.includes(message.author.id)) {
                         Array.filter(item => (item.match(message.author.id)) == null);
                     }
                 }
             })
             .catch(collected => {
-                message.reply('you reacted with neither a thumbs up, nor a thumbs down.');
+                message.reply('押してよ〜〜〜');
             });
-
-        sendMsg(message.channel.id, "今日の参加者↓");
-        for (let index = 0; index < Array.length; index++) {
-            const element = Array[index];
-            sendMsg(message.channel.id, "<@" + element + ">");
+        
+        client.channels.get(message.channel.id).send(now.getSeconds());
+        if (now.getMinutes == 18 && now.getSeconds() == 0) {
+            sendMsg(myserver_id, "今日の参加者↓");
+            for (let index = 0; index < Array.length; index++) {
+                const element = Array[index];
+                sendMsg(myserver_id, "<@" + element + ">");
+            }
         }
         return;
     }
