@@ -3,7 +3,7 @@ const querystring = require('querystring');
 const discord = require('discord.js');
 const client = new discord.Client();
 
-const mychannel = "779348258580987907";
+const mychannel_id = "779348258580987907";
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -34,11 +34,10 @@ http.createServer(function (req, res) {
 
 client.on('ready', message => {
     console.log('Bot準備完了～');
-    // client.user.setPresence({ game: { name: 'げーむ' } });
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    sendMsg(mychannel, "<@417553593697042432> おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    sendMsg(mychannel_id, "<@&780007022933573633> おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
 
 client.on('message', message => {
@@ -46,12 +45,17 @@ client.on('message', message => {
         return;
     }
     if (message.content.match(/にゃ～ん|にゃーん/)) {
-        let text = "にゃ～ん";
+        let text = "にゃ～んにゃん❤️";
         sendMsg(message.channel.id, text);
         return;
     }
     if (message.content.match(/こらー/)) {
         let text = "ごめんなさい><";
+        sendMsg(message.channel.id, text);
+        return;
+    }
+    if (message.content.startswith("!ナツメちゃん")) {
+        let text = "はーい♡";
         sendMsg(message.channel.id, text);
         return;
     }
