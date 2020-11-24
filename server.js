@@ -1,10 +1,13 @@
 const http = require('http');
 const querystring = require('querystring');
 const discord = require('discord.js');
+const { PassThrough } = require('stream');
 const client = new discord.Client();
 
 const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
+
+let Array = [];
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -38,6 +41,8 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
+    // const fastmessage = client.channels.cache.find(ch => ch.name === '村役場').send('参加する方は、ここにリアクションしてください！');
+    // const fastmessagereaction = fastmessage.react('1️⃣');//リアクションをBot自身が追加
     //sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
     //sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
@@ -47,59 +52,52 @@ client.on('message', message => {
         return;
     }
     if (message.content.match(/にゃ～ん|にゃーん/)) {
-        sendMsg(message.channel.id, "にゃ～んにゃん❤️");
+        sendReply(message.channel.id, "にゃ～んにゃん❤️");
         if (message.author.id == myserver_author_id) {
             sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
         }
         return;
     }
-    if (message.content.match(/こらー/)) {
-        sendMsg(message.channel.id, "ごめんなさい><");
+    if (message.content.match(/!help/)) {
         return;
     }
-    if (message.content.match(/！ナツメ/)) {
-        sendMsg(message.channel.id, "はーい❤️");
+    if (message.content.match(/!natume/)) {
+        client.channels.get(message.channel.id).send("今日参加する人〜").then(
+            msg => {
+                msg.react("👍")
+                msg.react("👎")
+            }
+        )
+        message.react('👍').then(() => message.react('😇'));
 
-        let count = 0;
-        let frelist = [];
-        let msg = sendMsg(message.channel.id, "今日参加する人〜✋");
+        const filter = (reaction, user) => {
+            return ['👍', '😇'].includes(reaction.emoji.name) && user.id === message.author.id;
+        };
+        message.awaitReactions(filter, { max: 2, time: 60000, errors: ['time'] })
+            .then(collected => {
+                const reaction = collected.first();
 
-        // 投票の欄
-        client.add_reaction(msg, '\u21a9')
-        client.add_reaction(msg, '⏫')
-        client.pin_message(msg)
-
-        // リアクションをチェックする
-        while (1) {
-            let target_reaction = client.wait_for_reaction(message = msg);
-            // 発言したユーザが同一でない場合 真
-            if (target_reaction.user != msg.author) {
-                // 押された絵文字が既存のものの場合 >> 左　del
-                if (target_reaction.reaction.emoji == '\u21a9') {
-                    // ◀のリアクションに追加があったら反応 frelistにuser.nameがあった場合　真
-                    if (target_reaction.user.name in frelist) {
-                        frelist.remove(target_reaction.user.name)
-                        count -= 1;
+                if (reaction.emoji.name === '👍') {
+                    if (!(Array.includes(message.author.id))) {
+                        Array.push(message.author.id);
                     }
-                    //押された絵文字が既存のものの場合 >> 右　add
-                } else if (target_reaction.reaction.emoji == '⏫') {
-                    if (!(target_reaction.user.name in frelist)) {
-                        // リストに名前追加
-                        frelist.append(target_reaction.user.name);
-                        count += 1;
+                } else {
+                    if (Array.includes(message.author.id)) {
+                        Array.filter(item => (item.match(message.author.id)) == null);
                     }
-                } else if (target_reaction.reaction.emoji == '✖') {
-                    // client.edit_message(msg, '募集終了\n' + '\n'.join(frelist));
-                    // client.unpin_message(msg);
-                    break;
-                    client.remove_reaction(msg, target_reaction.reaction.emoji, target_reaction.user);
-                    // ユーザーがつけたリアクションを消す※権限によってはエラー
                 }
-            } else
-                client.edit_message(msg, '募集終了\n' + '\n'.join(frelist))
+            })
+            .catch(collected => {
+                message.reply('you reacted with neither a thumbs up, nor a thumbs down.');
+            });
+
+        sendMsg(message.channel.id, "今日の参加者↓");
+        for (let index = 0; index < Array.length; index++) {
+            const element = Array[index];
+            sendMsg(message.channel.id, "<@" + element + ">");
         }
+        return;
     }
-    return;
 });
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
