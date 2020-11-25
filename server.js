@@ -8,6 +8,8 @@ const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
 
 const now = new Date();
+let cnt = -1;
+let Array = [];
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -41,40 +43,21 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    //sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-    //sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
 
-client.on('message', message => {
-    if (message.author.id == client.user.id || message.author.bot) {
-        return;
-    }
-    if (message.content.match(/にゃ～ん|にゃーん/)) {
-        sendReply(message.channel.id, "にゃ～んにゃん❤️");
-        if (message.author.id == myserver_author_id) {
-            sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
-        }
-        return;
-    }
-    if (message.content.match(/!help/)) {
-        return;
-    }
-    if (message.content.match(/!natume/)) {
-        client.channels.get(message.channel.id).send("今日参加する人〜")
-            .then(msg => {
-                msg.react("👍")
-                msg.react("😇")
-            });
 
-        let Array = [];
-        // message.react('👍').then(() => message.react('😇'));
+
+client.on('message', message => {
+
+    if (cnt == 0) {
+        message.react('👍').then(() => message.react('😇'));
 
         const filter = (reaction, user) => {
             return ['👍', '😇'].includes(reaction.emoji.name) && user.id === message.author.id;
         };
-
-        client.channels.get(message.channel.id).send(now.getSeconds());
-        message.awaitReactions(filter, { time: 15000 })
+        Array.length = 0;
+        cnt = 1;
+        message.awaitReactions(filter, { time: 10000 })
             .then(collected => {
                 const reaction = collected.first();
 
@@ -84,22 +67,44 @@ client.on('message', message => {
                     }
                 } else if (reaction.emoji.name === '😇') {
                     if (Array.includes(message.author.id)) {
-                        Array.filter(item => (item.match(message.author.id)) == null);
+                        // Array.filter(item => (item.match(message.author.id)) == null);
+                        Array.pop();
                     }
                 }
             })
             .catch(collected => {
                 message.reply('押してよ〜〜〜');
             });
-        
-        client.channels.get(message.channel.id).send(now.getSeconds());
-        if (now.getMinutes == 18 && now.getSeconds() == 0) {
-            sendMsg(myserver_id, "今日の参加者↓");
-            for (let index = 0; index < Array.length; index++) {
-                const element = Array[index];
-                sendMsg(myserver_id, "<@" + element + ">");
-            }
+        return;
+    }
+
+    if (message.author.id == client.user.id || message.author.bot) {
+        return;
+    }
+    if (message.content.match(/にゃ～ん|にゃーん/)) {
+        sendReply(message.channel.id, "にゃ～んにゃん❤️");
+        if (message.author.id == myserver_author_id) {
+            sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
+            // おかえり❤️
         }
+        return;
+    }
+    if (message.content.match(/!help/)) {
+        return;
+    }
+    if (message.content.match(/!natume/)) {
+        client.channels.get(message.channel.id).send("今日参加する人〜");
+        cnt = 0;
+        Array.length = 0;
+        return;
+    }
+    if (message.content.match(/!result/)) {
+        for (let index = 0; index < Array.length; index++) {
+            const element = Array[index];
+            sendMsg(myserver_id, "<@" + element + ">");
+            sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+        }
+        sendMsg(myserver_id, Array.length);
         return;
     }
 });
