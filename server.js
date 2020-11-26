@@ -7,9 +7,8 @@ const client = new discord.Client();
 const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
 
-const now = new Date();
-
 let array = [];
+let flag = false;
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -43,11 +42,52 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    //sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-    //sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    sendMsg(myserver_id, "今日参加する人〜");
+    flag = true;
+    array.length = 0;
 });
 
 client.on('message', message => {
+    if (flag && message.content.match(/今日参加する人〜/)) {
+        flag = false;
+        message.react('👍');
+        message.react('😇');
+        const filter = (reaction, user) => {
+            if (reaction.emoji.name == '👍') {
+                if (!(array.includes(user.id))) {
+                    array.push(user.id);
+                    console.log('👍', user.id);
+                }
+            } else if (reaction.emoji.name == '😇') {
+                if (array.includes(user.id)) {
+                    for (let index = 0; index < array.length; index++) {
+                        const element = array[index];
+                        if (element == user.id) {
+                            array.splice(index, 1);
+                        }
+                    }
+                    console.log('😇', user.id);
+                }
+            }
+            return ['👍', '😇'].includes(reaction.emoji.name);
+        };
+
+        const collector = message.createReactionCollector(filter, { time: 20000 });
+
+        collector.on('collect', (reaction, user) => {
+            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+        });
+
+        collector.on('end', collected => {
+            console.log("end");
+            for (let index = 0; index < array.length; index++) {
+                const element = array[index];
+                sendMsg(myserver_id, "<@" + element + ">");
+                sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+            }
+        });
+        return;
+    }
     if (message.author.id == client.user.id || message.author.bot) {
         return;
     }
@@ -61,33 +101,7 @@ client.on('message', message => {
     if (message.content.match(/!help/)) {
         return;
     }
-    if (message.content.match(/!natume/)) {
-        const filter = (reaction, user) => {
-            if (reaction.emoji.name == '👍') {
-                array.push(user.id);
-            } else if (reaction.emoji.name == '😇') {
-                array.pop();
-            }
-            return ['👍', '😇'].includes(reaction.emoji.name) && user.id === message.author.id;
-        };
 
-        const collector = message.createReactionCollector(filter, { time: 20000 });
-        array.length = 0;
-
-        collector.on('collect', (reaction, user) => {
-            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
-        });
-
-        collector.on('end', collected => {
-            for (let index = 0; index < array.length; index++) {
-                const element = array[index];
-                sendMsg(myserver_id, "<@" + element + ">");
-                sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-                console.log(element);
-            }
-        });
-        return;
-    }
 });
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
