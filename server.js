@@ -8,8 +8,8 @@ const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
 
 const now = new Date();
-let cnt = -1;
-let Array = [];
+
+let array = [];
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -43,41 +43,11 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
+    //sendMsg(myserver_id, "<@417553593697042432> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+    //sendMsg(myserver_id, "<@&780007022933573633> \nおはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
 });
 
-
-
 client.on('message', message => {
-
-    if (cnt == 0) {
-        message.react('👍').then(() => message.react('😇'));
-
-        const filter = (reaction, user) => {
-            return ['👍', '😇'].includes(reaction.emoji.name) && user.id === message.author.id;
-        };
-        Array.length = 0;
-        cnt = 1;
-        message.awaitReactions(filter, { time: 10000 })
-            .then(collected => {
-                const reaction = collected.first();
-
-                if (reaction.emoji.name === '👍') {
-                    if (!(Array.includes(message.author.id))) {
-                        Array.push(message.author.id);
-                    }
-                } else if (reaction.emoji.name === '😇') {
-                    if (Array.includes(message.author.id)) {
-                        // Array.filter(item => (item.match(message.author.id)) == null);
-                        Array.pop();
-                    }
-                }
-            })
-            .catch(collected => {
-                message.reply('押してよ〜〜〜');
-            });
-        return;
-    }
-
     if (message.author.id == client.user.id || message.author.bot) {
         return;
     }
@@ -85,7 +55,6 @@ client.on('message', message => {
         sendReply(message.channel.id, "にゃ～んにゃん❤️");
         if (message.author.id == myserver_author_id) {
             sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
-            // おかえり❤️
         }
         return;
     }
@@ -93,18 +62,30 @@ client.on('message', message => {
         return;
     }
     if (message.content.match(/!natume/)) {
-        client.channels.get(message.channel.id).send("今日参加する人〜");
-        cnt = 0;
-        Array.length = 0;
-        return;
-    }
-    if (message.content.match(/!result/)) {
-        for (let index = 0; index < Array.length; index++) {
-            const element = Array[index];
-            sendMsg(myserver_id, "<@" + element + ">");
-            sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-        }
-        sendMsg(myserver_id, Array.length);
+        const filter = (reaction, user) => {
+            if (reaction.emoji.name == '👍') {
+                array.push(user.id);
+            } else if (reaction.emoji.name == '😇') {
+                array.pop();
+            }
+            return ['👍', '😇'].includes(reaction.emoji.name) && user.id === message.author.id;
+        };
+
+        const collector = message.createReactionCollector(filter, { time: 20000 });
+        array.length = 0;
+
+        collector.on('collect', (reaction, user) => {
+            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
+        });
+
+        collector.on('end', collected => {
+            for (let index = 0; index < array.length; index++) {
+                const element = array[index];
+                sendMsg(myserver_id, "<@" + element + ">");
+                sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+                console.log(element);
+            }
+        });
         return;
     }
 });
