@@ -7,10 +7,11 @@ const client = new discord.Client();
 const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
 
-// var date = new Date();
-// var minute = date.getMinutes();	// 分
-// var second = date.getSeconds();	// 秒
-// var dayOfWeek = date.getDay();	// 曜日(数値)
+var date = new Date();
+var hour = date.getHours();	// 時
+var minute = date.getMinutes();	// 分
+var second = date.getSeconds();	// 秒
+var dayOfWeek = date.getDay();	// 曜日(数値)
 
 let array = [];
 
@@ -49,49 +50,6 @@ client.on('ready', message => {
 });
 
 client.on('message', message => {
-    if (message.content.match(/!natume/)) {
-        array.length = 0;
-        message.react('👍');
-        message.react('😇');
-        const filter = (reaction, user) => {
-            if (reaction.emoji.name == '👍') {
-                if (!(array.includes(user.id))) {
-                    array.push(user.id);
-                    console.log('👍', user.id);
-                }
-            } else if (reaction.emoji.name == '😇') {
-                if (array.includes(user.id)) {
-                    for (let index = 0; index < array.length; index++) {
-                        const element = array[index];
-                        if (element == user.id) {
-                            array.splice(index, 1);
-                        }
-                    }
-                    console.log('😇', user.id);
-                }
-            } else {
-                console.log(reaction.emoji.name, user.id);
-            }
-            return ['👍', '😇'].includes(reaction.emoji.name);
-        };
-
-        const collector = message.createReactionCollector(filter, { time: 20000 });
-
-        collector.on('collect', (reaction, user) => {
-            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
-        });
-
-        collector.on('end', collected => {
-            sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-            for (let index = 0; index < array.length; index++) {
-                const element = array[index];
-                sendMsg(myserver_id, "<@" + element + ">");
-                console.log(element);
-            }
-        });
-        return;
-    }
-
     if (message.author.id == client.user.id || message.author.bot) {
         return;
     }
@@ -131,7 +89,11 @@ client.on('message', message => {
             return ['👍', '😇'].includes(reaction.emoji.name);
         };
 
-        const collector = message.createReactionCollector(filter, { time: 20000 });
+        const due = hour * 3600 + 39 * 60 + 0;
+        const now = hour * 3600 + minute * 60 + second;
+        console.log(due, now);
+        console.log(hour, minute);
+        const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
 
         collector.on('collect', (reaction, user) => {
             console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
