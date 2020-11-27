@@ -63,7 +63,7 @@ client.on('message', message => {
     if (message.content.match(/!help/)) {
         return;
     }
-    if (message.content.match(/!natume/)) {
+    if (message.content.match(/!natume|今日参加する人〜/)) {
         array.length = 0;
         message.react('👍');
         message.react('😇');
@@ -89,10 +89,10 @@ client.on('message', message => {
             return ['👍', '😇'].includes(reaction.emoji.name);
         };
 
-        const due = hour * 3600 + 39 * 60 + 0;
-        const now = hour * 3600 + minute * 60 + second;
-        console.log(due, now);
-        console.log(hour, minute);
+        const due = 0 * 3600 + 40 * 60 + 0;
+        //hourの返り値がおかしい (JSTではなさそう)
+        const now = (hour + 9) % 24 * 3600 + minute * 60 + second;
+        console.log("通知まで", due - now, "秒");
         const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
 
         collector.on('collect', (reaction, user) => {
