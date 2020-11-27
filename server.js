@@ -7,8 +7,9 @@ const client = new discord.Client();
 const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
 
+const now = new Date();
+
 let array = [];
-let flag = false;
 
 http.createServer(function (req, res) {
     if (req.method == 'POST') {
@@ -42,14 +43,24 @@ client.on('ready', message => {
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
-    sendMsg(myserver_id, "今日参加する人〜");
-    flag = true;
-    array.length = 0;
 });
 
 client.on('message', message => {
-    if (flag && message.content.match(/今日参加する人〜/)) {
-        flag = false;
+    if (message.author.id == client.user.id || message.author.bot) {
+        return;
+    }
+    if (message.content.match(/にゃ～ん|にゃーん/)) {
+        sendReply(message.channel.id, "にゃ～んにゃん❤️");
+        if (message.author.id == myserver_author_id) {
+            sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
+        }
+        return;
+    }
+    if (message.content.match(/!help/)) {
+        return;
+    }
+    if (message.content.match(/!natume/)) {
+        array.length = 0;
         message.react('👍');
         message.react('😇');
         const filter = (reaction, user) => {
@@ -68,6 +79,8 @@ client.on('message', message => {
                     }
                     console.log('😇', user.id);
                 }
+            } else {
+                console.log(reaction.emoji.name, user.id);
             }
             return ['👍', '😇'].includes(reaction.emoji.name);
         };
@@ -79,29 +92,15 @@ client.on('message', message => {
         });
 
         collector.on('end', collected => {
-            console.log("end");
+            sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
             for (let index = 0; index < array.length; index++) {
                 const element = array[index];
                 sendMsg(myserver_id, "<@" + element + ">");
-                sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+                console.log(element);
             }
         });
         return;
     }
-    if (message.author.id == client.user.id || message.author.bot) {
-        return;
-    }
-    if (message.content.match(/にゃ～ん|にゃーん/)) {
-        sendReply(message.channel.id, "にゃ～んにゃん❤️");
-        if (message.author.id == myserver_author_id) {
-            sendMsg(message.channel.id, "ご主人様だ〜❤️嬉しい〜❤️");
-        }
-        return;
-    }
-    if (message.content.match(/!help/)) {
-        return;
-    }
-
 });
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
