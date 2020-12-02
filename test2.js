@@ -108,9 +108,6 @@ client.on('message', message => {
     }
     if (message.content.match(/にゃ～ん|にゃーん/)) {
         sendReply(message, "にゃ～んにゃん❤️");
-        if (message.author.id == myserver_author_id) {
-            sendMsg(message.channel.id, "ご主人様だ〜❤️大好き〜❤️");
-        }
         return;
     }
     if (message.content.match(/!help/)) {
