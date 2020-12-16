@@ -4,8 +4,7 @@ const discord = require('discord.js');
 const { PassThrough } = require('stream');
 const client = new discord.Client();
 
-// 自分
-const server_id = "779348258580987907";
+const server_id = "725334556017688670";
 const my_id = "417553593697042432";
 
 var date = new Date();
@@ -80,7 +79,6 @@ client.on('ready', message => {
             };
 
             const due = 23 * 3600 + 55 * 60 + 0;
-            //hourの返り値がおかしい (JSTではなさそう)
             const now = (hour + 9) % 24 * 3600 + minute * 60 + second;
             console.log("通知まで", due - now, "秒");
             const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
