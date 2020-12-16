@@ -4,8 +4,13 @@ const discord = require('discord.js');
 const { PassThrough } = require('stream');
 const client = new discord.Client();
 
+// 自分
 const myserver_id = "779348258580987907";
 const myserver_author_id = "417553593697042432";
+
+// 動物園
+// const myserver_id = "725334556017688670";
+// const myserver_author_id = "417553593697042432";
 
 var date = new Date();
 var hour = date.getHours();	// 時
@@ -43,10 +48,62 @@ http.createServer(function (req, res) {
 }).listen(3000);
 
 client.on('ready', message => {
+    //木曜日のみ実行
+    if (dayOfWeek != 4) return; 
+
     console.log('Bot準備完了～');
     client.user.setActivity('ごちうさ', {
         type: 'WATCHING'
     });
+
+    client.channels.get(myserver_id).send('今日参加する人〜')
+        .then(message => {
+            array.length = 0;
+            message.react('👍');
+            message.react('😇');
+            const filter = (reaction, user) => {
+                if (reaction.emoji.name == '👍') {
+                    if (!(array.includes(user.id))) {
+                        array.push(user.id);
+                        console.log('👍', user.id);
+                    }
+                } else if (reaction.emoji.name == '😇') {
+                    if (array.includes(user.id)) {
+                        for (let index = 0; index < array.length; index++) {
+                            const element = array[index];
+                            if (element == user.id) {
+                                array.splice(index, 1);
+                            }
+                        }
+                        console.log('😇', user.id);
+                    }
+                } else {
+                    console.log(reaction.emoji.name, user.id);
+                }
+                return ['👍', '😇'].includes(reaction.emoji.name);
+            };
+
+            const due = 1 * 3600 + 22 * 60 + 0;
+            //hourの返り値がおかしい (JSTではなさそう)
+            const now = (hour + 9) % 24 * 3600 + minute * 60 + second;
+            console.log("通知まで", due - now, "秒");
+            const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
+
+            collector.on('collect', (reaction, user) => {
+                console.log(`Collected ${reaction.emoji.name} from ${user.id}`);
+            });
+
+            collector.on('end', collected => {
+                sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
+                for (let index = 0; index < array.length; index++) {
+                    const element = array[index];
+                    sendMsg(myserver_id, "<@" + element + ">");
+                    console.log(element);
+                }
+            });
+            return;
+        })
+        .catch(console.error);
 });
 
 client.on('message', message => {
@@ -55,55 +112,6 @@ client.on('message', message => {
     }
     if (message.content.match(/にゃ～ん|にゃーん/)) {
         sendReply(message, "にゃ～んにゃん❤️");
-        return;
-    }
-    if (message.content.match(/!help/)) {
-        return;
-    }
-    if (message.content.match(/!natume|今日参加する人〜/)) {
-        array.length = 0;
-        message.react('👍');
-        message.react('😇');
-        const filter = (reaction, user) => {
-            if (reaction.emoji.name == '👍') {
-                if (!(array.includes(user.id))) {
-                    array.push(user.id);
-                    console.log('👍', user.id);
-                }
-            } else if (reaction.emoji.name == '😇') {
-                if (array.includes(user.id)) {
-                    for (let index = 0; index < array.length; index++) {
-                        const element = array[index];
-                        if (element == user.id) {
-                            array.splice(index, 1);
-                        }
-                    }
-                    console.log('😇', user.id);
-                }
-            } else {
-                console.log(reaction.emoji.name, user.id);
-            }
-            return ['👍', '😇'].includes(reaction.emoji.name);
-        };
-
-        const due = 0 * 3600 + 40 * 60 + 0;
-        //hourの返り値がおかしい (JSTではなさそう)
-        const now = (hour + 9) % 24 * 3600 + minute * 60 + second;
-        console.log("通知まで", due - now, "秒");
-        const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
-
-        collector.on('collect', (reaction, user) => {
-            console.log(`Collected ${reaction.emoji.name} from ${user.tag}`);
-        });
-
-        collector.on('end', collected => {
-            sendMsg(myserver_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-            for (let index = 0; index < array.length; index++) {
-                const element = array[index];
-                sendMsg(myserver_id, "<@" + element + ">");
-                console.log(element);
-            }
-        });
         return;
     }
 });
