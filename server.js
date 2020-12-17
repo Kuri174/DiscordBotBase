@@ -79,7 +79,7 @@ client.on('ready', message => {
                 return ['👍', '😇'].includes(reaction.emoji.name);
             };
 
-            const due = 23 * 3600 + 55 * 60 + 0;
+            const due = 21 * 3600 + 55 * 60 + 0;
             //hourの返り値がおかしい (JSTではなさそう)
             const now = (hour + 9) % 24 * 3600 + minute * 60 + second;
             console.log("通知まで", due - now, "秒");
