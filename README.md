@@ -1,8 +1,17 @@
 # DiscordBotBase
 
-GlitchでDiscordBotを作るためのベースです。
+参加確認用 DiscordBot
 
+## prepare
 
-## 詳細
+```
+npm install
+cp .env.sample .env
+#edit .env
+```
 
-[誰でも作れる！Discord Bot（基礎編）](https://note.com/exteoi/n/nf1c37cb26c41)をお読みください。
+## usage
+
+```
+npm start
+```
