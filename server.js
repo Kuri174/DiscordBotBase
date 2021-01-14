@@ -43,7 +43,7 @@ const sendInvitation = () => {
                 for (const user of registeredUsers) {
                     sendMsg(channel_id, "<@" + user + ">");
                 }
-                console.log(users);
+                console.log(registeredUsers);
             });
         })
         .catch(console.error);
@@ -57,7 +57,7 @@ client.on('ready', message => {
 
     // 12:00:00 木 JST
     const timezoneOffsetHour = (new Date()).getTimezoneOffset() / 60;
-    const scheduleHour = 12 + (9 + timezoneOffsetHour);
+    const scheduleHour = 12 - (9 + timezoneOffsetHour);
 
     schedule.scheduleJob(`0 ${scheduleHour} * * 4`, sendInvitation)
 });
