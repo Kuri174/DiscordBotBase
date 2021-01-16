@@ -5,7 +5,6 @@ const { PassThrough } = require('stream');
 const client = new discord.Client();
 
 const server_id = "725334556017688670";
-const my_id = "417553593697042432";
 
 var date = new Date();
 var hour = date.getHours();	// 時
