@@ -39,15 +39,19 @@ const sendInvitation = () => {
             const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
 
             collector.on('end', collected => {
-                sendMsg(channel_id, "おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！");
-                for (const user of registeredUsers) {
-                    sendMsg(channel_id, "<@" + user + ">");
-                }
-                console.log(registeredUsers);
+                const message = 
+                    Array.from(registeredUsers).map(user => `<@${user}>`).join(' ') +
+                    '\n' + 
+                    'おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！';
+
+                    sendMsg(channel_id, message);
+                    console.log(registeredUsers);
             });
         })
         .catch(console.error);
 }
+
+let job = null
 
 client.on('ready', message => {
     console.log('Bot準備完了～');
@@ -59,7 +63,9 @@ client.on('ready', message => {
     const timezoneOffsetHour = (new Date()).getTimezoneOffset() / 60;
     const scheduleHour = 12 - (9 + timezoneOffsetHour);
 
-    schedule.scheduleJob(`0 ${scheduleHour} * * 4`, sendInvitation)
+    if (job) job.cancel();
+
+    job = schedule.scheduleJob(`0 ${scheduleHour} * * 4`, sendInvitation)
 });
 
 client.on('message', message => {
