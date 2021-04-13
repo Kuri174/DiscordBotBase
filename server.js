@@ -13,15 +13,15 @@ const sendInvitation = () => {
             message.react('👍');
             message.react('😇');
             const filter = (reaction, user) => {
-                switch(reaction.emoji.name) {
-                case '👍':
-                    registeredUsers.add(user.id)
-                    break;
-                case '😇':
-                    registeredUsers.delete(user.id)
-                    break;
-                default:
-                    break;
+                switch (reaction.emoji.name) {
+                    case '👍':
+                        registeredUsers.add(user.id)
+                        break;
+                    case '😇':
+                        registeredUsers.delete(user.id)
+                        break;
+                    default:
+                        break;
                 }
                 console.log(reaction.emoji.name, user.id);
                 return ['👍', '😇'].includes(reaction.emoji.name);
@@ -32,20 +32,20 @@ const sendInvitation = () => {
             const minute = date.getMinutes();
             const second = date.getSeconds();
 
-            const due = 21 * 3600 + 55 * 60 + 0; //21:55:00
+            const due = 20 * 3600 + 55 * 60 + 0; //21:55:00
             const timezoneOffsetSec = (new Date()).getTimezoneOffset() * 60; // UTC = 0, JST = -9 * 60 * 60
             const now = hour * 3600 + minute * 60 + second + 9 * 60 * 60 + timezoneOffsetSec; // JST
             console.log("通知まで", due - now, "秒");
             const collector = message.createReactionCollector(filter, { time: (due - now) * 1000 });
 
             collector.on('end', collected => {
-                const message = 
+                const message =
                     Array.from(registeredUsers).map(user => `<@${user}>`).join(' ') +
-                    '\n' + 
+                    '\n' +
                     'おはよーーーーーー！！！！！！朝だよーーーーーー！！！！！！';
 
-                    sendMsg(channel_id, message);
-                    console.log(registeredUsers);
+                sendMsg(channel_id, message);
+                console.log(registeredUsers);
             });
         })
         .catch(console.error);
@@ -59,13 +59,13 @@ client.on('ready', message => {
         type: 'WATCHING'
     });
 
-    // 12:00:00 木 JST
+    // 12:00:00 金 JST
     const timezoneOffsetHour = (new Date()).getTimezoneOffset() / 60;
     const scheduleHour = 12 - (9 + timezoneOffsetHour);
 
     if (job) job.cancel();
 
-    job = schedule.scheduleJob(`0 ${scheduleHour} * * 4`, sendInvitation)
+    job = schedule.scheduleJob(`0 ${scheduleHour} * * 5`, sendInvitation)
 });
 
 client.on('message', message => {
@@ -79,23 +79,23 @@ client.on('message', message => {
 });
 
 if (process.env.DISCORD_BOT_TOKEN == undefined) {
-  console.log("DISCORD_BOT_TOKENが設定されていません。");
-  process.exit(0);
+    console.log("DISCORD_BOT_TOKENが設定されていません。");
+    process.exit(0);
 }
 
 client.login(process.env.DISCORD_BOT_TOKEN);
 
 function sendReply(message, text) {
-  message
-    .reply(text)
-    .then(console.log("リプライ送信: " + text))
-    .catch(console.error);
+    message
+        .reply(text)
+        .then(console.log("リプライ送信: " + text))
+        .catch(console.error);
 }
 
 function sendMsg(channelId, text, option = {}) {
-  client.channels
-    .get(channelId)
-    .send(text, option)
-    .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
-    .catch(console.error);
+    client.channels
+        .get(channelId)
+        .send(text, option)
+        .then(console.log("メッセージ送信: " + text + JSON.stringify(option)))
+        .catch(console.error);
 }
